@@ -1,6 +1,8 @@
+using Microsoft.AspNetCore.Identity;
+
 namespace Models;
 
-public class Role
+public class Role : IdentityRole<int>
 {
     
 }
