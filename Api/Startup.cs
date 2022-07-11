@@ -1,9 +1,6 @@
 using System.Reflection;
-using Api.Areas.Identity;
-using Api.Data;
 using Dal;
 using EfCoreRepository.Extensions;
-using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Models;
 
@@ -42,10 +39,7 @@ namespace Api
                 options.UseSqlite(_configuration.GetConnectionString("DefaultConnection"));
             });
 
-            services.AddEfRepository<EntityDbContext>(options =>
-            {
-                options.Profile(Assembly.Load("Dal"));
-            });
+            services.AddEfRepository<EntityDbContext>(options => { options.Profile(Assembly.Load("Dal")); });
 
             services.AddDatabaseDeveloperPageExceptionFilter();
             services.AddDefaultIdentity<User>(options =>
@@ -55,12 +49,6 @@ namespace Api
                     options.SignIn.RequireConfirmedEmail = false;
                 })
                 .AddEntityFrameworkStores<EntityDbContext>();
-            services.AddRazorPages();
-            services.AddServerSideBlazor();
-            services
-                .AddScoped<AuthenticationStateProvider,
-                    RevalidatingIdentityAuthenticationStateProvider<User>>();
-            services.AddSingleton<WeatherForecastService>();
 
             services.Scan(x =>
             {
@@ -95,12 +83,7 @@ namespace Api
             app.UseAuthentication();
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-                endpoints.MapBlazorHub();
-                endpoints.MapFallbackToPage("/_Host");
-            });
+            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
 
             Console.WriteLine("Application Started!");
         }

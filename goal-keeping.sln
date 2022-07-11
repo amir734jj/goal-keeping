@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Models", "Models\Models.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api", "Api\Api.csproj", "{C972FD51-CCB1-44D7-A1B3-69BA0FC7138C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UI", "UI\UI.csproj", "{57DD605F-EABC-408F-9108-2840A3A6431A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{C972FD51-CCB1-44D7-A1B3-69BA0FC7138C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C972FD51-CCB1-44D7-A1B3-69BA0FC7138C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C972FD51-CCB1-44D7-A1B3-69BA0FC7138C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{57DD605F-EABC-408F-9108-2840A3A6431A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57DD605F-EABC-408F-9108-2840A3A6431A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57DD605F-EABC-408F-9108-2840A3A6431A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{57DD605F-EABC-408F-9108-2840A3A6431A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
