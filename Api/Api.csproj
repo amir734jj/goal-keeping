@@ -8,13 +8,21 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.7" />
         <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="6.0.6" />
         <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.6" />
         <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.6" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.7" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.6" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.6" />
         <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.6" />
+        <PackageReference Include="MlkPwgen" Version="0.3.0" />
         <PackageReference Include="Scrutor" Version="4.2.0" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.1" />
+        <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.3.1" />
+        <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="6.3.1" />
+        <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="6.3.1" />
+        <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="6.3.1" />
     </ItemGroup>
 
     <ItemGroup>

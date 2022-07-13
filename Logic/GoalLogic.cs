@@ -48,7 +48,7 @@ public class GoalLogic : IGoalLogic
         return goal;
     }
 
-    public async Task<List<Goal>> GetAll()
+    public async Task<IEnumerable<Goal>> GetAll()
     {
         var goals = (await _repository.GetAll()).ToList();
         

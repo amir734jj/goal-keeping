@@ -4,7 +4,7 @@ namespace Logic.Interfaces;
 
 public interface IGoalLogic
 {
-    Task<List<Goal>> GetAll();
+    Task<IEnumerable<Goal>> GetAll();
 
     Task<Goal> Save(Goal goal);
 
