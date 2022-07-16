@@ -11,6 +11,7 @@ using Dal.Configs;
 using Dal.Interfaces;
 using Dal.ServiceApi;
 using EfCoreRepository.Extensions;
+using Lamar;
 using LiteDB;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -53,7 +54,7 @@ namespace Api
         /// </summary>
         /// <param name="services"></param>
         /// <returns></returns>
-        public void ConfigureServices(IServiceCollection services)
+        public void ConfigureContainer(ServiceRegistry services)
         {
             services.AddHttpsRedirection(options => options.HttpsPort = 443);
 
@@ -131,7 +132,7 @@ namespace Api
                         }, new List<string>()
                     }
                 });
-            });
+            }).AddSwaggerGenNewtonsoftSupport();
 
             services.AddMvc(x =>
                 {
@@ -203,6 +204,16 @@ namespace Api
             services.AddEfRepository<EntityDbContext>(x => x.Profile(Assembly.Load("Dal")));
 
             services.AddSingleton(jwtSetting);
+            
+            // Register stuff in container, using the StructureMap APIs...
+            services.Scan(_ =>
+            {
+                _.AssemblyContainingType(typeof(Startup));
+                _.Assembly("Api");
+                _.Assembly("Logic");
+                _.Assembly("Dal");
+                _.WithDefaultConventions();
+            });
 
             // If environment is localhost then use mock email service
             if (_env.IsDevelopment())
@@ -230,11 +241,6 @@ namespace Api
 
                 services.AddScoped<IFileService, S3FileService>();
             }
-            
-            services.Scan(x =>
-            {
-                x.FromAssemblies(Assembly.Load("Api"), Assembly.Load("Logic"), Assembly.Load("Dal"));
-            });
         }
 
         /// <summary>

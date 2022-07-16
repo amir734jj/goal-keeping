@@ -1,0 +1,54 @@
+@page "/Account/Login"
+@using Models.ViewModels.Identities
+@using UI.Interfaces
+@using Models.ViewModels.Api
+@using Newtonsoft.Json
+@using Refit
+@inject IAccountApi AccountApi
+@inject NavigationManager NavigationManager
+@inject ILogger<IAccountApi> Logger
+
+<PageTitle>Gaol-Keeping Login</PageTitle>
+<h3>Login</h3>
+
+<EditForm Model="@_model" OnValidSubmit="@(HandleLogin)">
+	<DataAnnotationsValidator />
+	
+	@if (_error != null)
+	{
+		<HxAlert Color="ThemeColor.Danger">@(string.Join(", ", _error.Errors))</HxAlert>
+	}
+
+	<HxInputText Label="Username" @bind-Value="@_model.Username" Placeholder="Enter username here" Hint="Username." />
+
+	<HxInputText Label="Password" @bind-Value="@_model.Password" Placeholder="Enter password here" Hint="Password." />
+
+	<HxSubmit Color="ThemeColor.Primary">Login</HxSubmit>
+
+</EditForm>
+
+@code {
+	private readonly LoginViewModel _model = new();
+
+	private ErrorViewModel? _error;
+
+	private async Task HandleLogin()
+	{
+		try
+		{
+			await AccountApi.Login(_model);
+
+			NavigationManager.NavigateTo("~/");
+		}
+		catch (ApiException e)
+		{
+			Logger.LogError(e, "Failed to login.");
+
+			_error = await e.GetContentAsAsync<ErrorViewModel>();
+			
+			Logger.LogTrace(JsonConvert.SerializeObject(_error));
+			
+			StateHasChanged();
+		}
+	}
+}

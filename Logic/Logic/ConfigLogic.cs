@@ -60,10 +60,10 @@ namespace Logic.Logic
             {
                 _logger.LogInformation("Successfully fetched the config from S3");
 
-                var json = System.Text.Encoding.Default.GetString(response.Data.ToArray());
+                var json = Encoding.Default.GetString(response.Data.ToArray());
                 var config = JsonConvert.DeserializeObject<GlobalConfigViewModel>(json);
-                
-                UpdateGlobalConfigs(config);
+
+                if (config != null) UpdateGlobalConfigs(config);
             }
             else
             {

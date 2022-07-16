@@ -1,3 +1,5 @@
+using Lamar.Microsoft.DependencyInjection;
+
 namespace Api
 {
     /// <summary>
@@ -15,6 +17,7 @@ namespace Api
 
         private static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
+                .UseLamar()
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     var port = Environment.GetEnvironmentVariable("PORT");

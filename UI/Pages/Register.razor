@@ -1,0 +1,53 @@
+@page "/Account/Register"
+@using Models.ViewModels.Identities
+@using UI.Interfaces
+@using Models.ViewModels.Api
+@using Refit
+@inject IAccountApi AccountApi
+@inject NavigationManager NavigationManager
+@inject ILogger<IAccountApi> Logger
+
+<PageTitle>Gaol-Keeping Login</PageTitle>
+<h3>Login</h3>
+
+<EditForm Model="@_model" OnValidSubmit="@(HandleLogin)">
+	<DataAnnotationsValidator />
+	
+	@if (_error != null)
+	{
+		<HxAlert Color="ThemeColor.Danger">@(string.Join(", ", _error.Errors))</HxAlert>
+	}
+
+	<HxInputText Label="Name" @bind-Value="@_model.Name" Placeholder="Enter name here" Hint="Name." />
+
+	<HxInputText Label="Email" @bind-Value="@_model.Email" Placeholder="Enter email here" Hint="Email." />
+
+	<HxInputText Label="Username" @bind-Value="@_model.Username" Placeholder="Enter username here" Hint="Username." />
+
+	<HxInputText Label="Password" @bind-Value="@_model.Password" Placeholder="Enter password here" Hint="Password." />
+
+	<HxSubmit Color="ThemeColor.Primary">Register</HxSubmit>
+
+</EditForm>
+
+@code {
+	private readonly RegisterViewModel _model = new();
+
+	private ErrorViewModel? _error;
+
+	private async Task HandleLogin()
+	{
+		try
+		{
+			await AccountApi.Register(_model);
+
+			NavigationManager.NavigateTo("~/");
+		}
+		catch (ApiException e)
+		{
+			Logger.LogError(e, "Failed to register.");
+
+			_error = await e.GetContentAsAsync<ErrorViewModel>();
+		}
+	}
+}
