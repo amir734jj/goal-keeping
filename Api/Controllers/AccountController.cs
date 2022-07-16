@@ -21,7 +21,7 @@ namespace Api.Controllers
     public class AccountController : Controller
     {
         private readonly UserManager<User> _userManager;
-        private readonly RoleManager<IdentityRole<int>> _roleManager;
+        private readonly RoleManager<Role> _roleManager;
         private readonly SignInManager<User> _signManager;
         private readonly JwtSettings _jwtSettings;
         private readonly IUserSetup _userSetup;
@@ -29,7 +29,7 @@ namespace Api.Controllers
         private readonly IProfileLogic _profileLogic;
 
         public AccountController(JwtSettings jwtSettings, UserManager<User> userManager,
-            RoleManager<IdentityRole<int>> roleManager, SignInManager<User> signManager, IUserSetup userSetup,
+            RoleManager<Role> roleManager, SignInManager<User> signManager, IUserSetup userSetup,
             IUserLogic userLogic, IProfileLogic profileLogic)
         {
             _jwtSettings = jwtSettings;
@@ -47,7 +47,7 @@ namespace Api.Controllers
         [SwaggerOperation("IsAuthenticated")]
         public IActionResult IsAuthenticated()
         {
-            return Ok(User.Identity.IsAuthenticated.ToString().ToLower());
+            return Ok(User.Identity?.IsAuthenticated.ToString().ToLower());
         }
         
         [DisallowAuthorized]
@@ -75,7 +75,7 @@ namespace Api.Controllers
             // Create the role if not exist
             if (!await _roleManager.RoleExistsAsync(role.ToString()))
             {
-                identityResults.Add(await _roleManager.CreateAsync(new IdentityRole<int>(role.ToString())));
+                identityResults.Add(await _roleManager.CreateAsync(new Role(role.ToString())));
             }
             
             // Register the user to the role
@@ -155,7 +155,7 @@ namespace Api.Controllers
         [SwaggerOperation("Refresh")]
         public async Task<IActionResult> Refresh()
         {
-            var user = await _userManager.FindByNameAsync(User.Identity.Name);
+            var user = await _userManager.FindByNameAsync(User.Identity?.Name);
                 
             var token = ResolveToken(user);
 

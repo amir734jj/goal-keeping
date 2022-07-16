@@ -4,9 +4,13 @@
 @using Models.ViewModels.Api
 @using Newtonsoft.Json
 @using Refit
+@using UI.Logic
 @inject IAccountApi AccountApi
 @inject NavigationManager NavigationManager
 @inject ILogger<IAccountApi> Logger
+@inject Blazored.SessionStorage.ISessionStorageService SessionStorage
+@inject JwtAuthStateProvider JwtAuthStateProvider;
+@attribute [AllowAnonymous]
 
 <PageTitle>Gaol-Keeping Login</PageTitle>
 <h3>Login</h3>
@@ -19,9 +23,9 @@
 		<HxAlert Color="ThemeColor.Danger">@(string.Join(", ", _error.Errors))</HxAlert>
 	}
 
-	<HxInputText Label="Username" @bind-Value="@_model.Username" Placeholder="Enter username here" Hint="Username." />
+	<HxInputText Label="Username" @bind-Value="@_model.Username" Placeholder="Enter username here" Hint="Username (at least 6 characters long)" />
 
-	<HxInputText Label="Password" @bind-Value="@_model.Password" Placeholder="Enter password here" Hint="Password." />
+	<HxInputText Label="Password" @bind-Value="@_model.Password" Placeholder="Enter password here" Hint="Password (at least 6 alphanumeric characters long)" Type="InputType.Password" />
 
 	<HxSubmit Color="ThemeColor.Primary">Login</HxSubmit>
 
@@ -36,9 +40,13 @@
 	{
 		try
 		{
-			await AccountApi.Login(_model);
+			var token = await AccountApi.Login(_model);
 
-			NavigationManager.NavigateTo("~/");
+			await SessionStorage.SetItemAsStringAsync("token", token);
+			
+			JwtAuthStateProvider.NotifyAuthenticationStateChanged();
+
+			NavigationManager.NavigateTo("/");
 		}
 		catch (ApiException e)
 		{
@@ -47,8 +55,6 @@
 			_error = await e.GetContentAsAsync<ErrorViewModel>();
 			
 			Logger.LogTrace(JsonConvert.SerializeObject(_error));
-			
-			StateHasChanged();
 		}
 	}
 }

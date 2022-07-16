@@ -1,0 +1,33 @@
+@page "/Account/Logout"
+@using UI.Interfaces
+@using Refit
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using UI.Logic
+@inject IAccountApi AccountApi
+@inject NavigationManager NavigationManager
+@inject ILogger<IAccountApi> Logger
+@inject Blazored.SessionStorage.ISessionStorageService SessionStorage
+@inject JwtAuthStateProvider JwtAuthStateProvider;
+
+<PageTitle>Gaol-Keeping Logout</PageTitle>
+<h3>Logout</h3>
+
+@code {
+	protected override async Task OnInitializedAsync()
+	{
+		try
+		{
+			await AccountApi.Logout();
+			
+			await SessionStorage.RemoveItemAsync("token");
+
+			JwtAuthStateProvider.NotifyAuthenticationStateChanged();
+		}
+		catch (ApiException e)
+		{
+			Logger.LogError(e, "Failed to logout.");
+		}
+		
+		NavigationManager.NavigateTo("/");
+	}
+}

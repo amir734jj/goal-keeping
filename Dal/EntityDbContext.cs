@@ -4,7 +4,7 @@ using Models;
 
 namespace Dal;
 
-public class EntityDbContext : IdentityDbContext<User, Role, int>
+public sealed class EntityDbContext : IdentityDbContext<User, Role, int>
 {
     public EntityDbContext(DbContextOptions<EntityDbContext> options)
         : base(options)
@@ -12,6 +12,12 @@ public class EntityDbContext : IdentityDbContext<User, Role, int>
         Database.EnsureCreated();
     }
 
-    public DbSet<Goal> Goals { get; set; }
+    public DbSet<Goal>? Goals { get; set; }
 
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        base.OnModelCreating(builder);
+        
+        builder.ApplyConfigurationsFromAssembly(typeof(EntityDbContext).Assembly);
+    }
 }

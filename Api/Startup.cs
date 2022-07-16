@@ -162,14 +162,14 @@ namespace Api
                 services.AddDatabaseDeveloperPageExceptionFilter();
             }
             
-            services.AddIdentity<User, IdentityRole<int>>(options =>
+            services.AddIdentity<User, Role>(options =>
                 {
                     options.SignIn.RequireConfirmedAccount = false;
                     options.SignIn.RequireConfirmedPhoneNumber = false;
                     options.SignIn.RequireConfirmedEmail = false;
                 })
                 .AddEntityFrameworkStores<EntityDbContext>()
-                .AddRoles<IdentityRole<int>>()
+                .AddRoles<Role>()
                 .AddDefaultTokenProviders();
             
             var jwtSetting = _configuration
@@ -255,8 +255,6 @@ namespace Api
 
             if (_env.IsDevelopment())
             {
-                app.UseDatabaseErrorPage();
-
                 // Enable middleware to serve generated Swagger as a JSON endpoint.
                 app.UseSwagger();
 

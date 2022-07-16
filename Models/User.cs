@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Identity;
 using Models.Enums;
 using Models.Interfaces;
@@ -14,9 +15,11 @@ public class User : IdentityUser<int>, IEntity
     public RoleEnum Role { get; set; }
         
     [Column(TypeName = "text")]
+    [AllowNull]
     public string Description { get; set; }
 
     public List<Goal> Goals { get; set; } = new();
 
+    [AllowNull]
     public string Photo { get; set; }
 }

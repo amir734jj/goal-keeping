@@ -3,3 +3,10 @@
 <PageTitle>Gaol-Keeping</PageTitle>
 
 <h1>Hello, world!</h1>
+
+@code {
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+}

@@ -6,6 +6,7 @@
 @inject IAccountApi AccountApi
 @inject NavigationManager NavigationManager
 @inject ILogger<IAccountApi> Logger
+@attribute [AllowAnonymous]
 
 <PageTitle>Gaol-Keeping Login</PageTitle>
 <h3>Login</h3>
@@ -18,14 +19,14 @@
 		<HxAlert Color="ThemeColor.Danger">@(string.Join(", ", _error.Errors))</HxAlert>
 	}
 
-	<HxInputText Label="Name" @bind-Value="@_model.Name" Placeholder="Enter name here" Hint="Name." />
+	<HxInputText Label="Name" @bind-Value="@_model.Name" Placeholder="Enter name here" Hint="Display name" />
 
-	<HxInputText Label="Email" @bind-Value="@_model.Email" Placeholder="Enter email here" Hint="Email." />
+	<HxInputText Label="Email" @bind-Value="@_model.Email" Placeholder="Enter email here" Hint="Email address" />
 
-	<HxInputText Label="Username" @bind-Value="@_model.Username" Placeholder="Enter username here" Hint="Username." />
+	<HxInputText Label="Username" @bind-Value="@_model.Username" Placeholder="Enter username here" Hint="Username (at least 6 characters long)" />
 
-	<HxInputText Label="Password" @bind-Value="@_model.Password" Placeholder="Enter password here" Hint="Password." />
-
+	<HxInputText Label="Password" @bind-Value="@_model.Password" Placeholder="Enter password here" Hint="Password (at least 6 alphanumeric characters long)" Type="InputType.Password" />
+	
 	<HxSubmit Color="ThemeColor.Primary">Register</HxSubmit>
 
 </EditForm>
@@ -41,7 +42,7 @@
 		{
 			await AccountApi.Register(_model);
 
-			NavigationManager.NavigateTo("~/");
+			NavigationManager.NavigateTo("/account/login");
 		}
 		catch (ApiException e)
 		{
