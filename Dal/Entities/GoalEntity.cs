@@ -10,6 +10,7 @@ namespace Dal.Entities
         {
             builder.HasOne(x => x.UserRef)
                 .WithMany(x => x.Goals)
+                .HasForeignKey(x => x.UserRefId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }

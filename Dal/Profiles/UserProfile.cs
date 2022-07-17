@@ -12,7 +12,6 @@ namespace Dal.Profiles
             entity.Name = dto.Name;
             entity.Email = dto.Email;
             entity.Description = dto.Description;
-            entity.PhoneNumber = dto.PhoneNumber;
             entity.LastLoginTime = dto.LastLoginTime;
             entity.Photo = dto.Photo;
         }

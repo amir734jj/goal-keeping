@@ -21,7 +21,6 @@ namespace Logic.Logic
                 Email = user.Email,
                 Description = user.Description,
                 Name = user.Name,
-                PhoneNumber = user.PhoneNumber,
                 Role = user.Role
             };
         }
@@ -33,7 +32,6 @@ namespace Logic.Logic
                 entity.Name = profileViewModel.Name;
                 entity.Description = profileViewModel.Description;
                 entity.Email = profileViewModel.Email;
-                entity.PhoneNumber = profileViewModel.PhoneNumber;
             });
         }
     }

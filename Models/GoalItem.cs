@@ -9,4 +9,5 @@ public class GoalItem : IEntity
     public string Text { get; set; }
     
     public Goal GoalRef { get; set; }
+    public int GoalRefId { get; set; }
 }

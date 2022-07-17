@@ -1,7 +1,6 @@
 @page "/Account/Logout"
 @using UI.Interfaces
 @using Refit
-@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @using UI.Logic
 @inject IAccountApi AccountApi
 @inject NavigationManager NavigationManager
@@ -22,12 +21,14 @@
 			await SessionStorage.RemoveItemAsync("token");
 
 			JwtAuthStateProvider.NotifyAuthenticationStateChanged();
+			
+			StateHasChanged();
 		}
 		catch (ApiException e)
 		{
 			Logger.LogError(e, "Failed to logout.");
 		}
 		
-		NavigationManager.NavigateTo("/");
+		NavigationManager.NavigateTo("/", true);
 	}
 }

@@ -1,16 +1,15 @@
 using Models;
+using Models.ViewModels.Api;
 
 namespace Logic.Interfaces;
 
-public interface IGoalLogic
+public interface IGoalLogic : IBasicLogic<Goal>
 {
-    Task<IEnumerable<Goal>> GetAll();
-
-    Task<Goal> Save(Goal goal);
-
-    Task<Goal> Update(int id, Goal goal);
-
-    Task<Goal> Delete(int id);
-
     Task<Goal> Renew(int id);
+
+    Task<GoalViewModel?> GetTodayGaol(User user);
+
+    Task<GoalViewModel?> SaveTodayGaol(User user, GoalViewModel goalViewModel);
+
+    Task<GoalViewModel?> UpdateTodayGaol(User user, GoalViewModel goalViewModel);
 }

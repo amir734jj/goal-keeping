@@ -45,8 +45,10 @@
 			await SessionStorage.SetItemAsStringAsync("token", token);
 			
 			JwtAuthStateProvider.NotifyAuthenticationStateChanged();
+			
+			StateHasChanged();
 
-			NavigationManager.NavigateTo("/");
+			NavigationManager.NavigateTo("/", true);
 		}
 		catch (ApiException e)
 		{

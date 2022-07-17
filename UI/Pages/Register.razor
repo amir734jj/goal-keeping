@@ -11,7 +11,7 @@
 <PageTitle>Gaol-Keeping Login</PageTitle>
 <h3>Login</h3>
 
-<EditForm Model="@_model" OnValidSubmit="@(HandleLogin)">
+<EditForm Model="@_model" OnValidSubmit="@(HandleRegister)">
 	<DataAnnotationsValidator />
 	
 	@if (_error != null)
@@ -36,7 +36,7 @@
 
 	private ErrorViewModel? _error;
 
-	private async Task HandleLogin()
+	private async Task HandleRegister()
 	{
 		try
 		{

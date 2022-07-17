@@ -1,21 +1,20 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace Api.Attributes
-{
-    public class DisallowAuthorizedAttribute : TypeFilterAttribute
-    {
-        public DisallowAuthorizedAttribute(): base(typeof(DisallowAuthorizedFilter)){}
-    }
+namespace Api.Attributes;
 
-    public class DisallowAuthorizedFilter : IAuthorizationFilter
+public class DisallowAuthorizedAttribute : TypeFilterAttribute
+{
+    public DisallowAuthorizedAttribute() : base(typeof(DisallowAuthorizedFilter))
     {
-        public void OnAuthorization(AuthorizationFilterContext context)
-        {
-            if (context.HttpContext.User.Identity is { IsAuthenticated: true })
-            {
-                context.Result = new BadRequestObjectResult("Authenticated user is disallowed from accessing this route");
-            }
-        }
+    }
+}
+
+public class DisallowAuthorizedFilter : IAuthorizationFilter
+{
+    public void OnAuthorization(AuthorizationFilterContext context)
+    {
+        if (context.HttpContext.User.Identity is { IsAuthenticated: true })
+            context.Result = new BadRequestObjectResult("Authenticated user is disallowed from accessing this route");
     }
 }

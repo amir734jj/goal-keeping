@@ -49,6 +49,10 @@ builder.Services.AddRefitClient<IProfileApi>(refitSettings)
     .ConfigureHttpClient(ConfigureHttpClient)
     .AddHttpMessageHandler<AuthHeaderHandler>();
 
+builder.Services.AddRefitClient<IGoalApi>(refitSettings)
+    .ConfigureHttpClient(ConfigureHttpClient)
+    .AddHttpMessageHandler<AuthHeaderHandler>();
+
 builder.Services.AddScoped<AuthenticationStateProvider, JwtAuthStateProvider>();
 builder.Services.AddScoped<JwtAuthStateProvider>();
 

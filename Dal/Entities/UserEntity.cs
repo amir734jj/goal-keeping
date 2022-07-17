@@ -14,5 +14,10 @@ public class UserEntity : IEntityTypeConfiguration<User>
 
         builder.Property(x => x.Photo)
             .HasDefaultValue(string.Empty);
+
+        builder.HasMany(x => x.Goals)
+            .WithOne(x => x.UserRef)
+            .HasForeignKey(x => x.UserRefId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

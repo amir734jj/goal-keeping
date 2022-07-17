@@ -1,0 +1,72 @@
+@page "/Account/Profile"
+@using UI.Interfaces
+@using Models.ViewModels.Api
+@using Newtonsoft.Json
+@using Refit
+@using EnumsNET
+@inject IProfileApi ProfileApi
+@inject ILogger<IAccountApi> Logger
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
+
+<PageTitle>Gaol-Keeping Login</PageTitle>
+
+<h3>Profile</h3>
+
+<EditForm Model="@_model" OnValidSubmit="@(HandleUpdateProfile)">
+    <DataAnnotationsValidator/>
+
+    @if (_error != null)
+    {
+        <HxAlert Color="ThemeColor.Danger">@(string.Join(", ", _error.Errors))</HxAlert>
+    }
+	else if (_profileUpdated)
+	{
+		<HxAlert Color="ThemeColor.Success" Dismissible="true">Successfully updated the profile.</HxAlert>
+	}
+    
+    <HxFormState Enabled="false">
+
+        <HxInputText Label="Email" @bind-Value="@_model.Email" Placeholder="Enter email here" Hint="Email address"/>
+        
+    </HxFormState>
+    
+    <HxInputText Label="Name" @bind-Value="@_model.Name" Placeholder="Enter name here" Hint="Display name"/>
+
+    <HxInputTextArea Label="Description" @bind-Value="@_model.Description" Placeholder="Enter description here" Hint="Description" />
+
+    <HxSubmit Color="ThemeColor.Primary">Update</HxSubmit>
+
+</EditForm>
+
+@code {
+    private ProfileViewModel _model = new();
+
+    private ErrorViewModel? _error;
+
+    private bool _profileUpdated;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _model = await ProfileApi.Get();
+    }
+
+    private async Task HandleUpdateProfile()
+    {
+        try
+        {
+            _model = await ProfileApi.Update(_model);
+
+            _profileUpdated = true;
+        }
+        catch (ApiException e)
+        {
+            Logger.LogError(e, "Failed to update profile.");
+
+            _error = await e.GetContentAsAsync<ErrorViewModel>();
+
+            Logger.LogTrace(JsonConvert.SerializeObject(_error));
+
+            _profileUpdated = false;
+        }
+    }
+}
