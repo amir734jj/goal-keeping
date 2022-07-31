@@ -1,6 +1,6 @@
 ﻿namespace Logic.Interfaces
 {
-    public interface IBasicLogic<T>
+    public interface IBasicLogic<T> where T: class
     {
         Task<IEnumerable<T>> GetAll();
 

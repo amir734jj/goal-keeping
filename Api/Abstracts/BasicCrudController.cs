@@ -6,7 +6,7 @@ using Swashbuckle.AspNetCore.Annotations;
 namespace Api.Abstracts;
 
 [ApiController]
-public abstract class BasicCrudController<T> : Controller
+public abstract class BasicCrudController<T> : Controller where T : class
 {
     [NonAction]
     protected abstract Task<IBasicLogic<T>> BasicLogic();
@@ -29,7 +29,7 @@ public abstract class BasicCrudController<T> : Controller
     }
 
     [HttpPut]
-    [Route("{id}")]
+    [Route("{id:int}")]
     [SwaggerOperation("Update")]
     public virtual async Task<IActionResult> Update([FromRoute] int id, [FromBody] T instance)
     {
@@ -39,7 +39,7 @@ public abstract class BasicCrudController<T> : Controller
     }
 
     [HttpDelete]
-    [Route("{id}")]
+    [Route("{id:int}")]
     [SwaggerOperation("Delete")]
     public virtual async Task<IActionResult> Delete([FromRoute] int id)
     {

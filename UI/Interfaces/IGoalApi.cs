@@ -1,4 +1,4 @@
-using System.Diagnostics.CodeAnalysis;
+using Models;
 using Models.ViewModels.Api;
 using Refit;
 
@@ -7,11 +7,14 @@ namespace UI.Interfaces;
 public interface IGoalApi
 {
     [Get("/goal/today")]
-    public Task<GoalViewModel?> GetTodayGaol();
+    public Task<List<Goal>> GetTodayGaols();
     
-    [Put("/goal/today")]
-    public Task<GoalViewModel> UpdateTodayGoal([Body] GoalViewModel goalViewModel);
+    [Put("/goal/{id}")]
+    public Task<GoalViewModel> Update([AliasAs("id")] int id, [Body]Goal goal);
     
-    [Post("/goal/today")]
-    public Task<GoalViewModel> SaveTodayGoal([Body] GoalViewModel goalViewModel);
+    [Post("/goal")]
+    public Task<GoalViewModel> Save([Body]Goal goal);
+    
+    [Delete("/goal/{id}")]
+    public Task<GoalViewModel> Delete([AliasAs("id")] int id);
 }

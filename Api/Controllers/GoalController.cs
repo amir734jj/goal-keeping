@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Models;
-using Models.ViewModels.Api;
 
 namespace Api.Controllers;
 
@@ -24,37 +23,15 @@ public class GoalController : BasicCrudController<Goal>
     
     [HttpGet]
     [Route("today")]
-    public async Task<IActionResult> GetTodayGaol()
+    public async Task<IActionResult> GetTodayGaols()
     {
         var user = await _userManager.FindByNameAsync(User.Identity?.Name);
         
-        var goals = await _goalLogic.GetTodayGaol(user);
+        var goals = await _goalLogic.GetAll(user, DateTimeOffset.Now);
 
         return Ok(goals);
     }
     
-    [HttpPut]
-    [Route("today")]
-    public async Task<IActionResult> UpdateTodayGaol([FromBody]GoalViewModel goalViewModel)
-    {
-        var user = await _userManager.FindByNameAsync(User.Identity?.Name);
-        
-        var goals = await _goalLogic.UpdateTodayGaol(user, goalViewModel);
-
-        return Ok(goals);
-    }
-    
-    [HttpPost]
-    [Route("today")]
-    public async Task<IActionResult> SaveTodayGaol([FromBody]GoalViewModel goalViewModel)
-    {
-        var user = await _userManager.FindByNameAsync(User.Identity?.Name);
-        
-        var goals = await _goalLogic.SaveTodayGaol(user, goalViewModel);
-
-        return Ok(goals);
-    }
-
     protected override async Task<IBasicLogic<Goal>> BasicLogic()
     {
         return _goalLogic;

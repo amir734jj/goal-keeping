@@ -2,6 +2,7 @@
 @using Models.ViewModels.Api
 @using Refit
 @using UI.Interfaces
+@using Models
 @inject IGoalApi GoalApi
 @inject ILogger<IGoalApi> Logger
 
@@ -10,19 +11,41 @@
 <h1> Welcome to gaol keeping website </h1>
 
 <AuthorizeView>
-    <Authorized Context="GoalIndex">
+    <Authorized Context="goalIndex">
         <EditForm Model="@_model" OnValidSubmit="@(HandleUpdateTodayGoal)">
             <DataAnnotationsValidator/>
 
-            <HxInputText Label="Goal #1" @bind-Value="@_model.Gaol1" Placeholder="Enter goal #1 text here." Hint="Hint: enter short, precise description what you want to do today"/>
+            @foreach (var ((existing, goal), index) in _goals.Zip(Enumerable.Range(0, _goals.Count)))
+            {
+                <HxInputText Label="@($"Goal #{index + 1}")" @bind-Value="@(goal.Text)" Placeholder="@($"Enter goal #{index + 1} text here.")" Hint="Hint: enter short, precise description what you want to do today">
+                    <InputGroupEndTemplate>
+                        <HxButton Color="ThemeColor.Danger" OnClick="@(() => DeleteGoal(goal))">Delete</HxButton>
+                    </InputGroupEndTemplate>
+                </HxInputText>
+            }
 
-            <HxInputText Label="Goal #2" @bind-Value="@_model.Gaol2" Placeholder="Enter goal #2 text here." Hint="Hint: enter short, precise description what you want to do today"/>
 
-            <HxInputText Label="Goal #3" @bind-Value="@_model.Gaol3" Placeholder="Enter goal #3 text here." Hint="Hint: enter short, precise description what you want to do today"/>
-            
-            <HxSubmit Color="ThemeColor.Primary">Save</HxSubmit>
+            <div class="container text-center">
+                <div class="row justify-content-end">
+                    <div class="col-4">
+                        <HxButton Color="ThemeColor.Secondary" OnClick="@(AddGoal)" Enabled="@(_goals.Count < 3)">New Goal</HxButton>
+                    </div>
+                    <div class="col-4">
+                        <HxSubmit Color="ThemeColor.Primary" Enabled="@(_goals.Count > 0)">Save</HxSubmit>
+                    </div>
+                </div>
+            </div>
 
         </EditForm>
+
+
+        @*<HxGrid TItem="Goal" Responsive="true" DataProvider="GetGridData" PageSize="10">
+        	<Columns>
+        		<HxGridColumn TItem="Goal" HeaderText="Display Name" ItemTextSelector="@(item => item.AddedDate)" IsDefaultSortColumn="true" />
+        		<HxGridColumn TItem="Goal" HeaderText="Name" ItemTextSelector="@(item => item.Name)" SortString="@nameof(CultureInfo.Name)" />
+        	</Columns>
+        </HxGrid>*@
+
     </Authorized>
     <NotAuthorized>
     </NotAuthorized>
@@ -36,24 +59,53 @@
 
     private GoalViewModel _model = new();
 
-    private GoalViewModel? existingTodayGaol;
+    private List<(bool existing, Goal goal)> _goals = new();
+
+    private void AddGoal()
+    {
+        _goals.Add((false, new Goal
+        {
+            AddedDate = DateTimeOffset.Now.Date
+        }));
+    }
+
+    private async Task DeleteGoal(Goal goal)
+    {
+        var t = _goals.Find(x => x.goal == goal);
+
+        if (t.existing)
+        {
+            await GoalApi.Delete(t.goal.Id);
+        }
+        else
+        {
+            _goals.Remove(t);
+        }
+    }
+
+    private async Task UpdateGoal(Goal goal)
+    {
+        var t = _goals.Find(x => x.goal == goal);
+
+        if (t.existing)
+        {
+            await GoalApi.Update(t.goal.Id, t.goal);
+        }
+        else
+        {
+            await GoalApi.Save(t.goal);
+        }
+    }
 
     public async Task HandleUpdateTodayGoal()
     {
         try
         {
-            if (existingTodayGaol != null)
-            {
-                _model = await GoalApi.UpdateTodayGoal(_model);
-            }
-            else
-            {
-                _model = await GoalApi.SaveTodayGoal(_model);
-            }
+            await Task.WhenAll(_goals.Select(x => x.goal).Select(UpdateGoal).ToArray());
         }
         catch (ApiException e)
         {
-            Logger.LogError(e, "Failed to update today goal.");
+            Logger.LogError(e, "Failed to update today goal");
         }
     }
 
@@ -65,11 +117,7 @@
             return;
         }
 
-        existingTodayGaol = await GoalApi.GetTodayGaol();
-
-        if (existingTodayGaol != null)
-        {
-            _model = existingTodayGaol;
-        }
+        _goals = (await GoalApi.GetTodayGaols()).Select(x => (true, x)).ToList();
     }
+
 }
