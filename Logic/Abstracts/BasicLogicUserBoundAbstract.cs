@@ -20,7 +20,6 @@ public abstract class BasicLogicUserBoundAbstract<T> : BasicLogicAbstract<T>,
     public Task<T> Save(User user, T instance)
     {
         instance.UserRefId = user.Id;
-        instance.UserRef = user;
 
         return GetBasicCrudDal().Save(instance);
     }
@@ -33,7 +32,6 @@ public abstract class BasicLogicUserBoundAbstract<T> : BasicLogicAbstract<T>,
     public Task<T> Update(User user, int id, T dto)
     {
         dto.UserRefId = user.Id;
-        dto.UserRef = user;
         
         return GetBasicCrudDal().Update(x => x.UserRefId == user.Id && x.Id == id, dto);
     }
@@ -43,7 +41,6 @@ public abstract class BasicLogicUserBoundAbstract<T> : BasicLogicAbstract<T>,
         return GetBasicCrudDal().Update(x => x.UserRefId == user.Id && x.Id == id, dto =>
         {
             dto.UserRefId = user.Id;
-            dto.UserRef = user;
 
             updater(dto);
         });

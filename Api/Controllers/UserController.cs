@@ -22,7 +22,7 @@ namespace Api.Controllers
             _userLogic = userLogic;
         }
 
-        protected override async Task<IBasicLogic<User>> BasicLogic()
+        protected override IBasicLogic<User> BasicLogic()
         {
             return _userLogic;
         }

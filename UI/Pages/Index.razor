@@ -3,6 +3,7 @@
 @using Refit
 @using UI.Interfaces
 @using Models
+@using Newtonsoft.Json
 @inject IGoalApi GoalApi
 @inject ILogger<IGoalApi> Logger
 
@@ -12,7 +13,7 @@
 
 <AuthorizeView>
     <Authorized Context="goalIndex">
-        <EditForm Model="@_model" OnValidSubmit="@(HandleUpdateTodayGoal)">
+        <EditForm Model="@_model" OnSubmit="@(HandleUpdateTodayGoal)">
             <DataAnnotationsValidator/>
 
             @foreach (var ((existing, goal), index) in _goals.Zip(Enumerable.Range(0, _goals.Count)))
@@ -24,27 +25,23 @@
                 </HxInputText>
             }
 
+            <div class="d-flex justify-content-end">
+                <div class="col-auto mx-4">
+                    <HxButton Color="ThemeColor.Secondary" OnClick="@(AddGoal)" Enabled="@(_goals.Count < 3)">New Goal</HxButton>
+                </div>
 
-            <div class="container text-center">
-                <div class="row justify-content-end">
-                    <div class="col-4">
-                        <HxButton Color="ThemeColor.Secondary" OnClick="@(AddGoal)" Enabled="@(_goals.Count < 3)">New Goal</HxButton>
-                    </div>
-                    <div class="col-4">
-                        <HxSubmit Color="ThemeColor.Primary" Enabled="@(_goals.Count > 0)">Save</HxSubmit>
-                    </div>
+                <div class="col-auto">
+                    <HxSubmit Color="ThemeColor.Primary" Enabled="@(_goals.Count > 0)">Save</HxSubmit>
                 </div>
             </div>
-
         </EditForm>
 
-
-        @*<HxGrid TItem="Goal" Responsive="true" DataProvider="GetGridData" PageSize="10">
+        <HxGrid TItem="Goal" Responsive="true" DataProvider="GetAllGoals">
         	<Columns>
-        		<HxGridColumn TItem="Goal" HeaderText="Display Name" ItemTextSelector="@(item => item.AddedDate)" IsDefaultSortColumn="true" />
-        		<HxGridColumn TItem="Goal" HeaderText="Name" ItemTextSelector="@(item => item.Name)" SortString="@nameof(CultureInfo.Name)" />
+        		<HxGridColumn TItem="Goal" HeaderText="Added Date" ItemTextSelector="@(item => item.AddedDate.ToString())" IsDefaultSortColumn="true" />
+        		<HxGridColumn TItem="Goal" HeaderText="Name" ItemTextSelector="@(item => item.Text)" />
         	</Columns>
-        </HxGrid>*@
+        </HxGrid>
 
     </Authorized>
     <NotAuthorized>
@@ -101,7 +98,13 @@
     {
         try
         {
-            await Task.WhenAll(_goals.Select(x => x.goal).Select(UpdateGoal).ToArray());
+            Logger.LogInformation(JsonConvert.SerializeObject(_goals));
+            
+            await Task.WhenAll(
+                _goals.Select(x => x.goal)
+                    .Where(x => !string.IsNullOrWhiteSpace(x.Text))
+                    .Select(UpdateGoal)
+                    .ToArray());
         }
         catch (ApiException e)
         {
@@ -120,4 +123,14 @@
         _goals = (await GoalApi.GetTodayGaols()).Select(x => (true, x)).ToList();
     }
 
+    protected async Task<GridDataProviderResult<Goal>> GetAllGoals(GridDataProviderRequest<Goal> request)
+    {
+        var allGoals = (await GoalApi.GetAll()).ToList();
+        
+        return new GridDataProviderResult<Goal>
+        {
+            Data = allGoals,
+            TotalCount = allGoals.Count
+        };
+    }
 }

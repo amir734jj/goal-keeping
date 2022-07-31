@@ -9,6 +9,9 @@ public interface IGoalApi
     [Get("/goal/today")]
     public Task<List<Goal>> GetTodayGaols();
     
+    [Get("/goal")]
+    public Task<List<Goal>> GetAll();
+    
     [Put("/goal/{id}")]
     public Task<GoalViewModel> Update([AliasAs("id")] int id, [Body]Goal goal);
     

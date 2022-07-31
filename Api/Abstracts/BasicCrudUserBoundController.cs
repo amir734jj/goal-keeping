@@ -1,17 +1,30 @@
 ﻿using System.Collections;
 using Logic.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Models;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace Api.Abstracts;
 
 [Authorize]
 [ApiController]
-public abstract class BasicCrudController<T> : Controller where T : class
+public abstract class BasicCrudUserBoundController<T> : Controller where T : class
 {
     [NonAction]
-    protected abstract IBasicLogic<T> BasicLogic();
+    protected abstract IBasicLogicUserBound<T> BasicLogic();
+
+    [NonAction]
+    protected abstract UserManager<User> UserManager();
+
+    [NonAction]
+    protected async Task<User> GetUser()
+    {
+        var user = await UserManager().FindByNameAsync(User.Identity?.Name);
+
+        return user;
+    }
     
     [HttpGet]
     [Route("")]
@@ -19,7 +32,7 @@ public abstract class BasicCrudController<T> : Controller where T : class
     [ProducesResponseType(typeof(IEnumerable), 200)]
     public virtual async Task<IActionResult> GetAll()
     {
-        return Ok(await BasicLogic().GetAll());
+        return Ok(await BasicLogic().GetAll(await GetUser()));
     }
 
     [HttpGet]
@@ -27,7 +40,7 @@ public abstract class BasicCrudController<T> : Controller where T : class
     [SwaggerOperation("Get")]
     public virtual async Task<IActionResult> Get([FromRoute] int id)
     {
-        return Ok(await BasicLogic().Get(id));
+        return Ok(await BasicLogic().Get(await GetUser(), id));
     }
 
     [HttpPut]
@@ -35,7 +48,7 @@ public abstract class BasicCrudController<T> : Controller where T : class
     [SwaggerOperation("Update")]
     public virtual async Task<IActionResult> Update([FromRoute] int id, [FromBody] T instance)
     {
-        return Ok(await BasicLogic().Update(id, instance));
+        return Ok(await BasicLogic().Update(await GetUser(), id, instance));
     }
 
     [HttpDelete]
@@ -43,7 +56,7 @@ public abstract class BasicCrudController<T> : Controller where T : class
     [SwaggerOperation("Delete")]
     public virtual async Task<IActionResult> Delete([FromRoute] int id)
     {
-        return Ok(await BasicLogic().Delete(id));
+        return Ok(await BasicLogic().Delete(await GetUser(), id));
     }
 
     [HttpPost]
@@ -51,6 +64,6 @@ public abstract class BasicCrudController<T> : Controller where T : class
     [SwaggerOperation("Save")]
     public virtual async Task<IActionResult> Save([FromBody] T instance)
     {
-        return Ok(await BasicLogic().Save(instance));
+        return Ok(await BasicLogic().Save(await GetUser(), instance));
     }
 }

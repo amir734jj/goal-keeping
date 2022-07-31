@@ -10,7 +10,7 @@ namespace Api.Controllers;
 [Authorize]
 [ApiController]
 [Route("Api/[controller]")]
-public class GoalController : BasicCrudController<Goal>
+public class GoalController : BasicCrudUserBoundController<Goal>
 {
     private readonly IGoalLogic _goalLogic;
     private readonly UserManager<User> _userManager;
@@ -25,15 +25,18 @@ public class GoalController : BasicCrudController<Goal>
     [Route("today")]
     public async Task<IActionResult> GetTodayGaols()
     {
-        var user = await _userManager.FindByNameAsync(User.Identity?.Name);
-        
-        var goals = await _goalLogic.GetAll(user, DateTimeOffset.Now);
+        var goals = await _goalLogic.GetAll(await GetUser(), DateTimeOffset.Now.Date);
 
         return Ok(goals);
     }
-    
-    protected override async Task<IBasicLogic<Goal>> BasicLogic()
+
+    protected override IBasicLogicUserBound<Goal> BasicLogic()
     {
         return _goalLogic;
+    }
+
+    protected override UserManager<User> UserManager()
+    {
+        return _userManager;
     }
 }
