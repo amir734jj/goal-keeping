@@ -1,0 +1,68 @@
+﻿@using Models.ViewModels.Api
+@using UI.Interfaces
+@using Models
+@inject IGoalApi GoalApi
+@inject ILogger<IGoalApi> Logger
+@inject NavigationManager NavigationManager
+
+<AuthorizeView>
+    <Authorized Context="goalIndex">
+
+        <div class="d-flex justify-content-end">
+            <div class="col-auto">
+                <HxButton Color="ThemeColor.Primary" OnClick="@(NavigateToAddGoal)">Add Goal</HxButton>
+            </div>
+        </div>
+
+        <HxGrid TItem="Goal" Responsive="true" DataProvider="GetAllGoals" @ref="goalsTable">
+            <Columns>
+                <HxGridColumn TItem="Goal" HeaderText="Added Date" ItemTextSelector="@(item => item.AddedDate.ToString())" IsDefaultSortColumn="true"/>
+                <HxGridColumn TItem="Goal" HeaderText="Name" ItemTextSelector="@(item => item.Text)"/>
+                <HxGridColumn TItem="Goal" HeaderText="Action">
+                    <ItemTemplate Context="item">
+                        <HxButton Color="ThemeColor.Warning" OnClick="@(() => EditGoal(item))">Edit</HxButton>
+                        <HxButton Color="ThemeColor.Danger" OnClick="@(() => DeleteGoal(item))">Delete</HxButton>
+                    </ItemTemplate>
+                </HxGridColumn>
+            </Columns>
+        </HxGrid>
+
+    </Authorized>
+    <NotAuthorized>
+    </NotAuthorized>
+</AuthorizeView>
+
+
+@code {
+
+    private HxGrid<Goal> goalsTable = new();
+
+    private async Task DeleteGoal(Goal goal)
+    {
+        await GoalApi.Delete(goal.Id);
+
+        await goalsTable.RefreshDataAsync();
+    }
+
+    private void NavigateToAddGoal()
+    {
+        NavigationManager.NavigateTo("/goal/new", false);
+    }
+
+    private void EditGoal(Goal goal)
+    {
+        NavigationManager.NavigateTo($"/goal/edit/{goal.Id}", false);
+    }
+
+    private async Task<GridDataProviderResult<Goal>> GetAllGoals(GridDataProviderRequest<Goal> request)
+    {
+        var allGoals = (await GoalApi.GetAll()).ToList();
+
+        return new GridDataProviderResult<Goal>
+        {
+            Data = allGoals,
+            TotalCount = allGoals.Count
+        };
+    }
+
+}

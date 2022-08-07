@@ -9,6 +9,9 @@ public interface IGoalApi
     [Get("/goal/today")]
     public Task<List<Goal>> GetTodayGaols();
     
+    [Get("/goal/{id}")]
+    public Task<Goal> Get([AliasAs("id")] int id);
+    
     [Get("/goal")]
     public Task<List<Goal>> GetAll();
     

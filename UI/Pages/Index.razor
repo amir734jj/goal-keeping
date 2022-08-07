@@ -1,136 +1,14 @@
-﻿@page "/"
-@using Models.ViewModels.Api
-@using Refit
-@using UI.Interfaces
-@using Models
-@using Newtonsoft.Json
-@inject IGoalApi GoalApi
-@inject ILogger<IGoalApi> Logger
+@page "/"
+@using UI.Pages.Goal
 
-<PageTitle>Gaol-Keeping</PageTitle>
+<PageTitle>Goal-Keeping</PageTitle>
 
-<h1> Welcome to gaol keeping website </h1>
+<h1> Welcome to goal keeping website </h1>
 
 <AuthorizeView>
     <Authorized Context="goalIndex">
-        <EditForm Model="@_model" OnSubmit="@(HandleUpdateTodayGoal)">
-            <DataAnnotationsValidator/>
-
-            @foreach (var ((existing, goal), index) in _goals.Zip(Enumerable.Range(0, _goals.Count)))
-            {
-                <HxInputText Label="@($"Goal #{index + 1}")" @bind-Value="@(goal.Text)" Placeholder="@($"Enter goal #{index + 1} text here.")" Hint="Hint: enter short, precise description what you want to do today">
-                    <InputGroupEndTemplate>
-                        <HxButton Color="ThemeColor.Danger" OnClick="@(() => DeleteGoal(goal))">Delete</HxButton>
-                    </InputGroupEndTemplate>
-                </HxInputText>
-            }
-
-            <div class="d-flex justify-content-end">
-                <div class="col-auto mx-4">
-                    <HxButton Color="ThemeColor.Secondary" OnClick="@(AddGoal)" Enabled="@(_goals.Count < 3)">New Goal</HxButton>
-                </div>
-
-                <div class="col-auto">
-                    <HxSubmit Color="ThemeColor.Primary" Enabled="@(_goals.Count > 0)">Save</HxSubmit>
-                </div>
-            </div>
-        </EditForm>
-
-        <HxGrid TItem="Goal" Responsive="true" DataProvider="GetAllGoals">
-        	<Columns>
-        		<HxGridColumn TItem="Goal" HeaderText="Added Date" ItemTextSelector="@(item => item.AddedDate.ToString())" IsDefaultSortColumn="true" />
-        		<HxGridColumn TItem="Goal" HeaderText="Name" ItemTextSelector="@(item => item.Text)" />
-        	</Columns>
-        </HxGrid>
-
+        <GoalIndex />
     </Authorized>
     <NotAuthorized>
     </NotAuthorized>
 </AuthorizeView>
-
-
-@code {
-
-    [CascadingParameter]
-    private Task<AuthenticationState> authenticationStateTask { get; set; }
-
-    private GoalViewModel _model = new();
-
-    private List<(bool existing, Goal goal)> _goals = new();
-
-    private void AddGoal()
-    {
-        _goals.Add((false, new Goal
-        {
-            AddedDate = DateTimeOffset.Now.Date
-        }));
-    }
-
-    private async Task DeleteGoal(Goal goal)
-    {
-        var t = _goals.Find(x => x.goal == goal);
-
-        if (t.existing)
-        {
-            await GoalApi.Delete(t.goal.Id);
-        }
-        else
-        {
-            _goals.Remove(t);
-        }
-    }
-
-    private async Task UpdateGoal(Goal goal)
-    {
-        var t = _goals.Find(x => x.goal == goal);
-
-        if (t.existing)
-        {
-            await GoalApi.Update(t.goal.Id, t.goal);
-        }
-        else
-        {
-            await GoalApi.Save(t.goal);
-        }
-    }
-
-    public async Task HandleUpdateTodayGoal()
-    {
-        try
-        {
-            Logger.LogInformation(JsonConvert.SerializeObject(_goals));
-            
-            await Task.WhenAll(
-                _goals.Select(x => x.goal)
-                    .Where(x => !string.IsNullOrWhiteSpace(x.Text))
-                    .Select(UpdateGoal)
-                    .ToArray());
-        }
-        catch (ApiException e)
-        {
-            Logger.LogError(e, "Failed to update today goal");
-        }
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        var userIdentity = (await authenticationStateTask).User.Identity;
-        if (userIdentity is {IsAuthenticated: false })
-        {
-            return;
-        }
-
-        _goals = (await GoalApi.GetTodayGaols()).Select(x => (true, x)).ToList();
-    }
-
-    protected async Task<GridDataProviderResult<Goal>> GetAllGoals(GridDataProviderRequest<Goal> request)
-    {
-        var allGoals = (await GoalApi.GetAll()).ToList();
-        
-        return new GridDataProviderResult<Goal>
-        {
-            Data = allGoals,
-            TotalCount = allGoals.Count
-        };
-    }
-}

@@ -9,6 +9,7 @@ namespace Dal.Profiles
         public override void Update(Goal entity, Goal dto)
         {
             entity.AddedDate = dto.AddedDate;
+            entity.Text = dto.Text;
         }
 
         public override IQueryable<Goal> Include<TQueryable>(TQueryable queryable)

@@ -1,0 +1,69 @@
+﻿@page "/goal/edit/{id:int}"
+@using UI.Interfaces
+@using Models
+@using Microsoft.AspNetCore.Components
+@using Newtonsoft.Json
+@using Refit
+@inject IGoalApi GoalApi
+@inject ILogger<IGoalApi> Logger
+@inject NavigationManager NavigationManager
+
+<AuthorizeView>
+    <Authorized Context="goalEdit">
+
+        <div class="container">
+            <h3> Update Goal </h3>
+
+            <EditForm Model="_goal" OnSubmit="@(HandleUpdateTodayGoal)">
+                <DataAnnotationsValidator/>
+
+                <HxInputText Label="@("Goal")" @bind-Value="@(_goal.Text)" Placeholder="@($"Enter goal text here.")" Hint="Hint: enter short, precise description what you want to do today" />
+
+                    <div class="d-flex justify-content-end">
+
+                    <div class="col-auto">
+                        <HxSubmit Color="ThemeColor.Success" Enabled="@(CanSave())">Update</HxSubmit>
+                    </div>
+                </div>
+            </EditForm>
+        </div>
+
+    </Authorized>
+    <NotAuthorized>
+    </NotAuthorized>
+</AuthorizeView>
+
+
+@code {
+
+    [Parameter]
+    public int Id { get; set; }
+
+    private Goal _goal = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _goal = await GoalApi.Get(Id);
+    }
+
+    private async Task HandleUpdateTodayGoal()
+    {
+        try
+        {
+            Logger.LogInformation(JsonConvert.SerializeObject(_goal));
+
+            await GoalApi.Update(_goal.Id, _goal);
+            
+            NavigationManager.NavigateTo("/", true);
+        }
+        catch (ApiException e)
+        {
+            Logger.LogError(e, "Failed to update today goal");
+        }
+    }
+    
+    private bool CanSave()
+    {
+        return !string.IsNullOrWhiteSpace(_goal.Text);
+    }
+}

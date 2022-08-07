@@ -1,0 +1,106 @@
+﻿@page "/goal/new"
+@using Refit
+@using UI.Interfaces
+@using Models
+@using Newtonsoft.Json
+@inject IGoalApi GoalApi
+@inject ILogger<IGoalApi> Logger
+
+<AuthorizeView>
+    <Authorized Context="goalNew">
+
+        <div class="container">
+            <h3> Add New Goal(s) </h3>
+
+            <EditForm Model="_goals" OnSubmit="@(HandleSaveTodayGoal)">
+                <DataAnnotationsValidator/>
+
+                @foreach (var (goal, index) in _goals.Zip(Enumerable.Range(0, _goals.Count)))
+                {
+                    <HxInputText Label="@($"Goal #{index + 1}")" @bind-Value="@(goal.Text)" Placeholder="@($"Enter goal #{index + 1} text here.")" Hint="Hint: enter short, precise description what you want to do today">
+                        <InputGroupEndTemplate>
+                            <HxButton Color="ThemeColor.Secondary" OnClick="@(() => DeleteGoal(goal))">Delete</HxButton>
+                        </InputGroupEndTemplate>
+                    </HxInputText>
+                }
+
+                <div class="d-flex justify-content-end">
+                    <div class="col-auto mx-4">
+                        <HxButton Color="ThemeColor.Primary" OnClick="@(AddGoal)" Enabled="@(_goals.Count < 3)">New Goal</HxButton>
+                    </div>
+
+                    <div class="col-auto">
+                        <HxSubmit Color="ThemeColor.Success" Enabled="@(CanSave())">Save</HxSubmit>
+                    </div>
+                </div>
+            </EditForm>
+        </div>
+
+    </Authorized>
+    <NotAuthorized>
+    </NotAuthorized>
+</AuthorizeView>
+
+
+@code {
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    private List<Goal> _goals = new();
+
+    private void AddGoal()
+    {
+        _goals.Add(new Goal
+        {
+            AddedDate = DateTimeOffset.Now.Date
+        });
+    }
+
+    private async Task DeleteGoal(Goal goal)
+    {
+        _goals.Remove(goal);
+    }
+
+    private async Task SaveGoal(Goal goal)
+    {
+        await GoalApi.Save(goal);
+    }
+
+    private async Task HandleSaveTodayGoal()
+    {
+        try
+        {
+            Logger.LogInformation(JsonConvert.SerializeObject(_goals));
+
+            await Task.WhenAll(
+                _goals
+                    .Where(x => !string.IsNullOrWhiteSpace(x.Text))
+                    .Select(SaveGoal)
+                    .ToArray());
+
+            _goals = new List<Goal>();
+        }
+        catch (ApiException e)
+        {
+            Logger.LogError(e, "Failed to save today goal");
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var userIdentity = (await authenticationStateTask).User.Identity;
+        if (userIdentity is {IsAuthenticated: false })
+        {
+            return;
+        }
+
+        _goals = (await GoalApi.GetTodayGaols()).ToList();
+    }
+
+    private bool CanSave()
+    {
+        return _goals.Count > 0 && _goals.Any(x => !string.IsNullOrWhiteSpace(x.Text));
+    }
+
+}
