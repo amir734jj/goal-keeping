@@ -276,6 +276,7 @@ namespace Api
             app.UseDefaultFiles()
                 .UseStaticFiles()
                 .UseCookiePolicy()
+                .UseHttpsRedirection()
                 .UseSession()
                 .UseRouting()
                 .UseCors("CorsPolicy")

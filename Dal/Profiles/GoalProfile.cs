@@ -6,10 +6,10 @@ namespace Dal.Profiles
 {
     public class GoalProfile : EntityProfile<Goal>
     {
-        public override void Update(Goal entity, Goal dto)
+        public GoalProfile()
         {
-            entity.AddedDate = dto.AddedDate;
-            entity.Text = dto.Text;
+            Map(x => x.AddedDate);
+            Map(x => x.Text);
         }
 
         public override IQueryable<Goal> Include<TQueryable>(TQueryable queryable)

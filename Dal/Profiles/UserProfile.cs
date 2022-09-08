@@ -6,14 +6,14 @@ namespace Dal.Profiles
 {
     public class UserProfile : EntityProfile<User>
     {
-        public override void Update(User entity, User dto)
+        public UserProfile()
         {
-            entity.Role = dto.Role;
-            entity.Name = dto.Name;
-            entity.Email = dto.Email;
-            entity.Description = dto.Description;
-            entity.LastLoginTime = dto.LastLoginTime;
-            entity.Photo = dto.Photo;
+            Map(x => x.Role);
+            Map(x => x.Name);
+            Map(x => x.Email);
+            Map(x => x.Description);
+            Map(x => x.LastLoginTime);
+            Map(x => x.Photo);
         }
 
         public override IQueryable<User> Include<TQueryable>(TQueryable queryable)

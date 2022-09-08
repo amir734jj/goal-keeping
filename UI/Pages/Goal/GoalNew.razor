@@ -5,6 +5,7 @@
 @using Newtonsoft.Json
 @inject IGoalApi GoalApi
 @inject ILogger<IGoalApi> Logger
+@inject NavigationManager NavigationManager
 
 <AuthorizeView>
     <Authorized Context="goalNew">
@@ -80,6 +81,8 @@
                     .ToArray());
 
             _goals = new List<Goal>();
+
+            NavigationManager.NavigateTo("/", true);
         }
         catch (ApiException e)
         {
@@ -95,7 +98,8 @@
             return;
         }
 
-        _goals = (await GoalApi.GetTodayGaols()).ToList();
+        _goals = new List<Goal>();
+        AddGoal();
     }
 
     private bool CanSave()

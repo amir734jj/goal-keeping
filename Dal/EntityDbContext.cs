@@ -17,7 +17,7 @@ public sealed class EntityDbContext : IdentityDbContext<User, Role, int>
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
-        
+
         builder.ApplyConfigurationsFromAssembly(typeof(EntityDbContext).Assembly);
     }
 }
