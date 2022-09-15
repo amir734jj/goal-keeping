@@ -15,7 +15,7 @@ namespace Dal.ServiceApi
             _storage = database.FileStorage;
         }
 
-        public async Task<GenericFileServiceResponse> Upload(string fileKey, string fileName, string contentType,
+        public Task<GenericFileServiceResponse> Upload(string fileKey, string fileName, string contentType,
             Stream data, IDictionary<string, string> metadata)
         {
             metadata["Name"] = fileName;
@@ -25,13 +25,13 @@ namespace Dal.ServiceApi
                 new BsonDocument(
                     new Dictionary<string, BsonValue>(metadata.ToDictionary(x => x.Key, x => new BsonValue(x.Value)))));
 
-            return new GenericFileServiceResponse(
+            return Task.FromResult(new GenericFileServiceResponse(
                 HttpStatusCode.Accepted,
                 "Successfully uploaded file to LiteDb storage"
-            );
+            ));
         }
 
-        public async Task<DownloadFileServiceResponse> Download(string keyName)
+        public Task<DownloadFileServiceResponse> Download(string keyName)
         {
             var result = new MemoryStream();
             var response = _storage.Download(keyName, result);
@@ -39,24 +39,24 @@ namespace Dal.ServiceApi
             var fileName = response.Metadata["Name"];
             var contentType = response.Metadata["Content-Type"];
 
-            return new DownloadFileServiceResponse(
+            return Task.FromResult(new DownloadFileServiceResponse(
                 HttpStatusCode.OK,
                 "Successfully downloaded uploaded file from LiteDb storage",
                 result,
                 new ReadOnlyDictionary<string, string>(response.Metadata.ToDictionary(x => x.Key, x => x.Value.AsString)),
-                contentType, fileName);
+                contentType, fileName));
         }
 
-        public async Task<GenericFileServiceResponse> Delete(string keyName)
+        public Task<GenericFileServiceResponse> Delete(string keyName)
         {
             var status = _storage.Delete(keyName) ? HttpStatusCode.OK : HttpStatusCode.BadRequest;
 
-            return new GenericFileServiceResponse(status, $"Deleting a file with key: {keyName}");
+            return Task.FromResult(new GenericFileServiceResponse(status, $"Deleting a file with key: {keyName}"));
         }
 
-        public async Task<List<string>> List()
+        public Task<List<string>> List()
         {
-            return _storage.FindAll().Select(x => x.Id).ToList();
+            return Task.FromResult(_storage.FindAll().Select(x => x.Id).ToList());
         }
     }
 }

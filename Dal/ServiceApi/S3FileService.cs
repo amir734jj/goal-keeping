@@ -174,7 +174,7 @@ namespace Dal.ServiceApi
 
             var result = await _client.ListObjectsV2Async(request);
 
-            return result.S3Objects?.Select(x => x.Key).ToList();
+            return result.S3Objects?.Select(x => x.Key).ToList() ?? new List<string>();
         }
     }
 }

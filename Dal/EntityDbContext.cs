@@ -12,7 +12,7 @@ public sealed class EntityDbContext : IdentityDbContext<User, Role, int>
         Database.EnsureCreated();
     }
 
-    public DbSet<Goal>? Goals { get; set; }
+    public DbSet<Goal> Goals { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
